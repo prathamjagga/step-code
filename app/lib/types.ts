@@ -31,9 +31,9 @@ export interface LeetCodeProblem {
 
 
 export const difficultyColors = {
-  Easy: "text-green-600 bg-green-50 border-green-200",
-  Medium: "text-yellow-600 bg-yellow-50 border-yellow-200", 
-  Hard: "text-red-600 bg-red-50 border-red-200"
+  Easy: "text-green-700 bg-green-100 border-green-300 dark:text-green-300 dark:bg-green-900/30 dark:border-green-700 hover:bg-green-200 dark:hover:bg-green-800/40",
+  Medium: "text-yellow-700 bg-yellow-100 border-yellow-300 dark:text-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700 hover:bg-yellow-200 dark:hover:bg-yellow-800/40", 
+  Hard: "text-red-700 bg-red-100 border-red-300 dark:text-red-300 dark:bg-red-900/30 dark:border-red-700 hover:bg-red-200 dark:hover:bg-red-800/40"
 };
 
 export const tagColors = [

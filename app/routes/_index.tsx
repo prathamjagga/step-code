@@ -166,6 +166,16 @@ export default function Index() {
     return Array.from(subtagsSet).sort();
   }, [problems, pendingFilters.selectedTags]);
 
+  // Helper function to generate LeetCode problem slug
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+  };
+
   // Optimized filtering and sorting
   const filteredAndSortedProblems = useMemo(() => {
     let filtered = problems;
@@ -718,7 +728,13 @@ export default function Index() {
                       <div key={problem.ID} className="grid grid-cols-12 gap-2 lg:gap-4 p-2 lg:p-4 hover:bg-slate-50 dark:hover:bg-gray-700 border-b dark:border-gray-600">
                         <div className="col-span-1 font-mono text-xs lg:text-sm dark:text-slate-300">{problem.ID}</div>
                         <div className="col-span-4">
-                          <div className="font-medium text-sm lg:text-base dark:text-white truncate">{problem.Title}</div>
+                          <div 
+                            className="font-medium text-sm lg:text-base text-blue-600 dark:text-blue-400 cursor-pointer hover:underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors break-words"
+                            onClick={() => window.open(`https://leetcode.com/problems/${generateSlug(problem.Title)}/`, '_blank')}
+                            title={`Open ${problem.Title} on LeetCode`}
+                          >
+                            {problem.Title}
+                          </div>
                           <div className="text-xs text-slate-400 dark:text-slate-500 mt-1 hidden lg:block">
                             {problem.ContestID_en} • {problem.ProblemIndex}
                           </div>
