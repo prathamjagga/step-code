@@ -209,7 +209,6 @@ export default function Index() {
     }
 
     // Sort the filtered results
-    console.log('Sorting with appliedFilters.sortBy:', appliedFilters.sortBy);
     filtered.sort((a, b) => {
       switch (appliedFilters.sortBy) {
         case "rating-desc": return b.Rating - a.Rating;
@@ -222,14 +221,14 @@ export default function Index() {
       }
     });
 
-    return filtered;
-  }, [appliedFilters]);
+    return [...filtered];
+  }, [problems, appliedFilters]);
 
   // Paginated results for better performance
   const paginatedProblems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return filteredAndSortedProblems.slice(startIndex, startIndex + pageSize);
-  }, [filteredAndSortedProblems, currentPage]);
+  }, [filteredAndSortedProblems, currentPage, pageSize]);
 
   const totalPages = Math.ceil(filteredAndSortedProblems.length / pageSize);
 
@@ -244,9 +243,6 @@ export default function Index() {
       ratingMax: pendingFilters.ratingMax ? parseInt(pendingFilters.ratingMax) : 4000,
       sortBy: pendingFilters.sortBy
     };
-    
-    console.log('Applying filters:', newFilters);
-    console.log('PendingFilters sortBy:', pendingFilters.sortBy);
     
     setAppliedFilters(newFilters);
     setCurrentPage(1);

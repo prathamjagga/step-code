@@ -85020,7 +85020,7 @@
   {
     "Rating": 1269.8118442786,
     "ID": 2843,
-    "Title": "  Count Symmetric Integers",
+    "Title": "Count Symmetric Integers",
     "TitleZH": "统计对称整数的数目",
     "TitleSlug": "count-symmetric-integers",
     "ContestSlug": "weekly-contest-361",
@@ -85059,7 +85059,7 @@
     "isEnhanced": true,
     "enhancedAt": "2025-08-16T17:33:54.459Z",
     "problemDetails": {
-      "title": "  Count Symmetric Integers",
+      "title": "Count Symmetric Integers",
       "difficulty": "Easy",
       "questionId": "2998",
       "hasUserSubmission": true
