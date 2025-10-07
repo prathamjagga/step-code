@@ -1,7 +1,7 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Input } from "~/components/ui/input";
@@ -51,6 +51,16 @@ export default function Index() {
   
   // Mobile filters modal state
   const [showFiltersModal, setShowFiltersModal] = useState(false);
+  
+  // Horizontal scroll state for shadows
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Vertical scroll state for shadows
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+  const verticalScrollRef = useRef<HTMLDivElement>(null);
   
   // Dark mode state
   const [darkMode, setDarkMode] = useState(() => {
@@ -377,7 +387,43 @@ export default function Index() {
     });
   }, []);
 
-  const hasActiveFilters = appliedFilters.searchTerm || 
+  // Check horizontal scroll capability
+  const checkScrollCapability = useCallback(() => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+    }
+  }, []);
+
+  // Check vertical scroll capability
+  const checkVerticalScrollCapability = useCallback(() => {
+    if (verticalScrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = verticalScrollRef.current;
+      setCanScrollUp(scrollTop > 0);
+      setCanScrollDown(scrollTop < scrollHeight - clientHeight - 1);
+    }
+  }, []);
+
+  // Check scroll capability on mount and when problems change
+  useEffect(() => {
+    const checkScroll = () => {
+      checkScrollCapability();
+      checkVerticalScrollCapability();
+    };
+    
+    // Check initially
+    checkScroll();
+    
+    // Check on window resize
+    window.addEventListener('resize', checkScroll);
+    
+    return () => {
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScrollCapability, checkVerticalScrollCapability, filteredAndSortedProblems]);
+
+  const hasActiveFilters = appliedFilters.searchTerm ||
                           appliedFilters.difficulty !== "all" ||
                           appliedFilters.tags.size > 0 ||
                           appliedFilters.subtags.size > 0 ||
@@ -400,6 +446,51 @@ export default function Index() {
   }
 
   return (
+    <>
+      <style>{`
+        /* Custom scrollbar styles */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+          height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgb(229 231 235); /* gray-200 */
+          border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgb(156 163 175); /* gray-400 */
+          border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgb(107 114 128); /* gray-500 */
+        }
+        
+        /* Dark mode styles */
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgb(31 41 55); /* gray-800 */
+        }
+        
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgb(75 85 99); /* gray-600 */
+        }
+        
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgb(107 114 128); /* gray-500 */
+        }
+        
+        /* For Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgb(156 163 175) rgb(229 231 235);
+        }
+        
+        .dark .custom-scrollbar {
+          scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+        }
+      `}</style>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-900 flex flex-col">
       {/* Fixed Header */}
       <div className="flex-shrink-0 p-6 pb-0">
@@ -695,18 +786,30 @@ export default function Index() {
                 </CardDescription>
               </CardHeader>
                 <CardContent className="p-0 flex flex-col relative">
-                  {/* Mobile scroll indicator */}
-                  <div className="lg:hidden absolute top-2 right-2 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 bg-white/90 dark:bg-gray-800/90 rounded-md shadow-sm pointer-events-none z-20">
-                    ← Swipe →
-                  </div>
+                  {/* Left shadow indicator */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-gray-300/60 via-gray-200/30 dark:from-gray-900/70 dark:via-gray-800/40 to-transparent pointer-events-none z-20 transition-opacity duration-700 ${canScrollLeft ? 'opacity-100' : 'opacity-0'}`} />
+                  
+                  {/* Right shadow indicator */}
+                  <div className={`absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-300/60 via-gray-200/30 dark:from-gray-900/70 dark:via-gray-800/40 to-transparent pointer-events-none z-20 transition-opacity duration-700 ${canScrollRight ? 'opacity-100' : 'opacity-0'}`} />
                   
                   {/* Horizontal scroll wrapper */}
-                  <div className="overflow-x-auto">
-                    <div className="min-w-[768px]">
+                  <div 
+                    ref={scrollContainerRef}
+                    className="overflow-x-scroll custom-scrollbar"
+                    onScroll={checkScrollCapability}
+                  >
+                    <div className="min-w-[768px] relative">
+                      {/* Bottom shadow indicator (for vertical scroll) */}
+                      <div className={`absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-gray-300/60 via-gray-200/30 dark:from-gray-900/70 dark:via-gray-800/40 to-transparent pointer-events-none z-10 transition-opacity duration-700 ${canScrollDown ? 'opacity-100' : 'opacity-0'}`} />
+                      
                       {/* Vertical scroll wrapper with sticky header */}
-                      <div className="max-h-96 overflow-y-auto rounded-b-lg bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-850">
+                      <div 
+                        ref={verticalScrollRef}
+                        className="max-h-96 overflow-y-scroll custom-scrollbar rounded-b-lg bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-850"
+                        onScroll={checkVerticalScrollCapability}
+                      >
                         {/* Sticky Header */}
-                        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-500 shadow-md">
+                        <div className={`sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-500 transition-shadow duration-700 ${canScrollUp ? 'shadow-md' : ''}`}>
                           <div className="grid grid-cols-12 gap-3 md:gap-4 lg:gap-4 p-2 lg:p-4 text-xs lg:text-sm font-medium text-slate-600 dark:text-slate-300">
                             <div className="col-span-1">ID</div>
                             <div className="col-span-4 lg:col-span-4">Title</div>
@@ -979,5 +1082,6 @@ export default function Index() {
         </div>
       </div>
     </div>
+    </>
   );
 }
