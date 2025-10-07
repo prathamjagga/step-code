@@ -387,13 +387,13 @@ export default function Index() {
   // Show loader until theme is loaded
   if (!themeLoaded) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             StepCode
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+          <p className="text-slate-600">Loading...</p>
         </div>
       </div>
     );
@@ -694,21 +694,30 @@ export default function Index() {
                   )}
                 </CardDescription>
               </CardHeader>
-                <CardContent className="p-0 flex flex-col">
-                  <div className="max-h-96 overflow-auto rounded-b-lg bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-850">
-                  {/* Sticky Header */}
-                  <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-500 shadow-md">
-                    <div className="grid grid-cols-12 gap-2 lg:gap-4 p-2 lg:p-4 text-xs lg:text-sm font-medium text-slate-600 dark:text-slate-300">
-                      <div className="col-span-1">ID</div>
-                      <div className="col-span-4 lg:col-span-4">Title</div>
-                      <div className="col-span-2">Diff</div>
-                      <div className="col-span-1">Rating</div>
-                      <div className="col-span-4">Tags</div>
-                    </div>
+                <CardContent className="p-0 flex flex-col relative">
+                  {/* Mobile scroll indicator */}
+                  <div className="lg:hidden absolute top-2 right-2 px-2 py-1 text-xs text-slate-500 dark:text-slate-400 bg-white/90 dark:bg-gray-800/90 rounded-md shadow-sm pointer-events-none z-20">
+                    ← Swipe →
                   </div>
                   
-                  {/* Table Body */}
-                  <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {/* Horizontal scroll wrapper */}
+                  <div className="overflow-x-auto">
+                    <div className="min-w-[768px]">
+                      {/* Vertical scroll wrapper with sticky header */}
+                      <div className="max-h-96 overflow-y-auto rounded-b-lg bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-850">
+                        {/* Sticky Header */}
+                        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-300 dark:border-gray-500 shadow-md">
+                          <div className="grid grid-cols-12 gap-3 md:gap-4 lg:gap-4 p-2 lg:p-4 text-xs lg:text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <div className="col-span-1">ID</div>
+                            <div className="col-span-4 lg:col-span-4">Title</div>
+                            <div className="col-span-2">Diff</div>
+                            <div className="col-span-1">Rating</div>
+                            <div className="col-span-4">Tags</div>
+                          </div>
+                        </div>
+                        
+                        {/* Table Body */}
+                        <div className="divide-y divide-gray-200 dark:divide-gray-700">
                     {paginatedProblems.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
                         <div className="text-gray-400 dark:text-gray-500 mb-2">
@@ -725,7 +734,7 @@ export default function Index() {
                       </div>
                     ) : (
                       paginatedProblems.map((problem) => (
-                      <div key={problem.ID} className="grid grid-cols-12 gap-2 lg:gap-4 p-2 lg:p-4 hover:bg-slate-50 dark:hover:bg-gray-700 border-b dark:border-gray-600">
+                      <div key={problem.ID} className="grid grid-cols-12 gap-3 md:gap-4 lg:gap-4 p-2 lg:p-4 hover:bg-slate-50 dark:hover:bg-gray-700 border-b dark:border-gray-600">
                         <div className="col-span-1 font-mono text-xs lg:text-sm dark:text-slate-300">{problem.ID}</div>
                         <div className="col-span-4">
                           <div 
@@ -779,39 +788,41 @@ export default function Index() {
                           </div>
                         </div>
                       </div>
-                      ))
+                    ))
                     )}
-                  </div>
-                </div>
-                
-                {/* Pagination */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-600">
-                    <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
-                      Page {currentPage} of {totalPages}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-4 py-3 border-t dark:border-gray-600">
+                      <div className="flex items-center text-sm text-slate-500 dark:text-slate-400">
+                        Page {currentPage} of {totalPages}
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                          disabled={currentPage === 1}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                          disabled={currentPage === totalPages}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
 
