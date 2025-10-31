@@ -19,16 +19,18 @@ jobs:
             const repo = context.repo.repo;
             const owner = context.repo.owner;
             const message = `
-👋 Hi @${context.payload.issue.user.login}!
+            👋 Hi @${context.payload.issue.user.login}!
 
-Thanks for opening this issue — we really appreciate your contribution!  
-Our team will take a look as soon as possible. In the meantime, feel free to share more details or context if you have any.
+            Thanks for opening this issue — we really appreciate your contribution!  
+            Our team will take a look as soon as possible. In the meantime, feel free to share more details or context if you have any.
 
-Happy contributing! 🚀
-`;
+            Happy contributing! 🚀
+            `;
             await github.rest.issues.createComment({
               owner,
               repo,
               issue_number: issueNumber,
               body: message
             });
+
+
